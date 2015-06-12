@@ -81,7 +81,7 @@ module Fluent
             process(processing_filename)
             after_processing(processing_filename)
           rescue => e
-            log.error "in_destructive_read: processing error: #{e.message}, file: #{processing_filename}",
+            log.error "in_destructive_read: processing error: #{e}, file: #{processing_filename}",
               :error => e, :error_class => e.class
             log.error_backtrace
             safe_fail(processing_filename)
@@ -134,7 +134,7 @@ module Fluent
       begin
         safe_rename(filename, get_error_filename(filename))
       rescue => e
-        log.error "in_destructive_read: rename #{filename} to error name: #{e.massage}",
+        log.error "in_destructive_read: rename #{filename} to error name. message: #{e}",
           :error => e, :error_class => e.class
         log.error_backtrace
       end
