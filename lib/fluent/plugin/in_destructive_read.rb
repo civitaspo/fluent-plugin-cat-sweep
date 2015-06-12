@@ -11,7 +11,7 @@ module Fluent
 
     config_param :input_path,              :string
     config_param :format,                  :string
-    config_param :process_file_age,        :integer  # seconds
+    config_param :process_file_timedelta,  :integer  # seconds
     config_param :tag,                     :string,  :default => 'file.destructive_read'
     config_param :processing_file_suffix,  :string,  :default => '.processing'
     config_param :error_file_suffix,       :string,  :default => '.error'
@@ -106,7 +106,7 @@ module Fluent
     end
 
     def young_file?(filename)
-      (Time.now - File.mtime(filename)).to_i < @process_file_age
+      (Time.now - File.mtime(filename)).to_i < @process_file_timedelta
     end
 
     def get_temporary_filename(filename)
