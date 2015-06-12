@@ -94,7 +94,7 @@ module Fluent
     private
 
     def will_process?(filename)
-      !(processing?(filename) or error_file?(filename) or young_file?(filename))
+      !(processing?(filename) or error_file?(filename) or sufficient_timedelta?(filename))
     end
 
     def processing?(filename)
@@ -105,7 +105,7 @@ module Fluent
       filename.end_with?(@error_file_suffix)
     end
 
-    def young_file?(filename)
+    def sufficient_timedelta?(filename)
       (Time.now - File.mtime(filename)).to_i < @process_file_timedelta
     end
 
