@@ -9,16 +9,17 @@ module Fluent
     class FormatError < StandardError
     end
 
-    config_param :input_path,             :string
-    config_param :format,                 :string
-    config_param :process_file_age,       :integer # seconds
-    config_param :tag,                    :string,  :default => 'file.destructive_read'
-    config_param :processing_file_suffix, :string,  :default => '.processing'
-    config_param :error_file_suffix,      :string,  :default => '.error'
-    config_param :line_terminated_by,     :string,  :default => "\n"
-    config_param :oneline_max_bytes,      :integer, :default => 536870912 # 512MB
-    config_param :processed_file_path,    :string,  :default => nil
-    config_param :run_interval,           :integer, :default => 5
+    config_param :input_path,              :string
+    config_param :format,                  :string
+    config_param :process_file_age,        :integer  # seconds
+    config_param :tag,                     :string,  :default => 'file.destructive_read'
+    config_param :processing_file_suffix,  :string,  :default => '.processing'
+    config_param :error_file_suffix,       :string,  :default => '.error'
+    config_param :line_terminated_by,      :string,  :default => "\n"
+    config_param :oneline_max_bytes,       :integer, :default => 536870912 # 512MB
+    config_param :move_to,                 :string,  :default => '/tmp'
+    config_param :remove_after_processing, :bool,    :default => false
+    config_param :run_interval,            :integer, :default => 5
 
 
     # To support log_level option implemented by Fluentd v0.10.43
@@ -47,6 +48,10 @@ module Fluent
 
       if @line_terminated_by.empty?
         raise Fluent::ConfigError, "in_destructive_read: `line_terminated_by` must has some letters."
+      end
+
+      if !remove_file? and !Dir.exists?(@move_to)
+        raise Fluent::ConfigError, "in_destructive_read: `move_to` directory must be existed."
       end
 
       @read_bytes_once = 262144 # 256 KB
@@ -145,7 +150,7 @@ module Fluent
     end
 
     def remove_file?
-      @processed_file_path ? false : true
+      @remove_after_processing
     end
 
     def read_each_line(io)
@@ -196,7 +201,7 @@ module Fluent
       if remove_file?
         FileUtils.rm(filename)
       else
-        FileUtils.mv(filename, @processed_file_path)
+        FileUtils.mv(filename, @move_to)
       end
     end
   end
