@@ -9,7 +9,7 @@ module Fluent
     class FormatError < StandardError
     end
 
-    config_param :input_path,              :string
+    config_param :file_path_with_glob,     :string
     config_param :format,                  :string
     config_param :process_file_timedelta,  :integer  # seconds
     config_param :tag,                     :string,  :default => 'file.destructive_read'
@@ -72,7 +72,7 @@ module Fluent
       while @processing
         sleep @run_interval
 
-        Dir.glob(@input_path).map do |filename|
+        Dir.glob(@file_path_with_glob).map do |filename|
           next unless will_process?(filename)
           log.debug "in_destructive_read: process: #{filename}"
           temporary_filename = get_temporary_filename(filename)
