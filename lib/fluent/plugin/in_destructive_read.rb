@@ -74,18 +74,17 @@ module Fluent
 
         Dir.glob(@file_path_with_glob).map do |filename|
           next unless will_process?(filename)
-          log.debug "in_destructive_read: process: #{filename}"
-          temporary_filename = get_temporary_filename(filename)
+          processing_filename = get_processing_filename(filename)
 
           begin
-            safe_rename(filename, temporary_filename)
-            process(temporary_filename)
-            after_processing(temporary_filename)
+            safe_rename(filename, processing_filename)
+            process(processing_filename)
+            after_processing(processing_filename)
           rescue => e
-            log.error "in_destructive_read: processing error: #{e.message}, file: #{temporary_filename}",
+            log.error "in_destructive_read: processing error: #{e.message}, file: #{processing_filename}",
               :error => e, :error_class => e.class
             log.error_backtrace
-            safe_fail(temporary_filename)
+            safe_fail(processing_filename)
           end
         end
       end
@@ -109,7 +108,7 @@ module Fluent
       (Time.now - File.mtime(filename)).to_i < @process_file_timedelta
     end
 
-    def get_temporary_filename(filename)
+    def get_processing_filename(filename)
       tmpfile = String.new
       tmpfile << filename << '.' << Process.pid.to_s << '.'
       tmpfile << Time.now.to_i.to_s << '.' << @processing_file_suffix
