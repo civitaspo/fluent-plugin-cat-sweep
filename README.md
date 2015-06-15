@@ -36,7 +36,7 @@ Or install it yourself as:
   # Required. process files that are older than this parameter(seconds).
   # [WARNING!!]: this plugin move or remove files even if the files open,
   # so this parameter is set as seconds that the application close files definitely.  
-  process_file_timedelta 60
+  waiting_seconds 60
 
   # Optional. default is file.destructive_read
   tag test.input

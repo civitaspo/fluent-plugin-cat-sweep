@@ -40,12 +40,12 @@ class DestructiveReadInputTest < Test::Unit::TestCase
 
     d = create_driver(CONFIG_BASE + %[
       format tsv
-      process_file_timedelta 5
+      waiting_seconds 5
       ])
 
     assert_equal "#{TMP_DIR_FROM}/*", d.instance.instance_variable_get(:@file_path_with_glob)
     assert_equal 'tsv', d.instance.instance_variable_get(:@format)
-    assert_equal 5, d.instance.instance_variable_get(:@process_file_timedelta)
+    assert_equal 5, d.instance.instance_variable_get(:@waiting_seconds)
   end
 
   def compare_test_result(emits, tests)
@@ -81,7 +81,7 @@ class DestructiveReadInputTest < Test::Unit::TestCase
 
       d = create_driver(CONFIG_BASE + %[
         format #{format}
-        process_file_timedelta 0
+        waiting_seconds 0
         keys hdfs_path,unixtimestamp,label,message
         ])
       d.run
@@ -107,7 +107,7 @@ class DestructiveReadInputTest < Test::Unit::TestCase
 
     d = create_driver(CONFIG_BASE + %[
       format #{format}
-      process_file_timedelta 0
+      waiting_seconds 0
       keys hdfs_path,unixtimestamp,label,message
       move_to #{TMP_DIR_TO}
       ])
@@ -140,7 +140,7 @@ class DestructiveReadInputTest < Test::Unit::TestCase
 
     d = create_driver(CONFIG_BASE + %[
       format #{format}
-      process_file_timedelta 0
+      waiting_seconds 0
       keys hdfs_path,unixtimestamp,label,message
       move_to #{TMP_DIR_TO}
       oneline_max_bytes 1

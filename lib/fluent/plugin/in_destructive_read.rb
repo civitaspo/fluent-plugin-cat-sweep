@@ -11,7 +11,7 @@ module Fluent
 
     config_param :file_path_with_glob,     :string
     config_param :format,                  :string
-    config_param :process_file_timedelta,  :integer  # seconds
+    config_param :waiting_seconds,         :integer  # seconds
     config_param :tag,                     :string,  :default => 'file.destructive_read'
     config_param :processing_file_suffix,  :string,  :default => '.processing'
     config_param :error_file_suffix,       :string,  :default => '.error'
@@ -94,7 +94,7 @@ module Fluent
     private
 
     def will_process?(filename)
-      !(processing?(filename) or error_file?(filename) or sufficient_timedelta?(filename))
+      !(processing?(filename) or error_file?(filename) or sufficient_waiting?(filename))
     end
 
     def processing?(filename)
@@ -105,8 +105,8 @@ module Fluent
       filename.end_with?(@error_file_suffix)
     end
 
-    def sufficient_timedelta?(filename)
-      (Time.now - File.mtime(filename)).to_i < @process_file_timedelta
+    def sufficient_waiting?(filename)
+      (Time.now - File.mtime(filename)).to_i < @waiting_seconds
     end
 
     def get_processing_filename(filename)
