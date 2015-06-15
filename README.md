@@ -34,7 +34,9 @@ Or install it yourself as:
   keys xpath,access_time,label,payload
 
   # Required. process files that are older than this parameter(seconds).
-  process_file_age 60
+  # [WARNING!!]: this plugin move or remove files even if the files open,
+  # so this parameter is set as seconds that the application close files definitely.  
+  process_file_timedelta 60
 
   # Optional. default is file.destructive_read
   tag test.input
@@ -53,7 +55,13 @@ Or install it yourself as:
 
   # Optional. this parameter indicated,
   # files that is processed are not removed but move to processed_file_path.
-  processed_file_path /tmp/test_processed
+  # default '/tmp'
+  move_to /tmp/test_processed
+
+  # Optional. this parameter indicated, `move_to` is ignored.
+  # files that is processed are removed.
+  # default is false.
+  remove_after_processing true
 
   # Optional. default 5 seconds.
   run_interval 10
