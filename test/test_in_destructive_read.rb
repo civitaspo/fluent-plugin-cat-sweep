@@ -18,7 +18,7 @@ class DestructiveReadInputTest < Test::Unit::TestCase
   TMP_DIR_TO   = '/tmp/fluent_plugin_test_in_destructive_read_to'
 
   CONFIG_BASE = %[
-    input_path #{TMP_DIR_FROM}/*
+    file_path_with_glob #{TMP_DIR_FROM}/*
   ]
 
   def create_driver(conf, use_v1 = true)
@@ -40,12 +40,12 @@ class DestructiveReadInputTest < Test::Unit::TestCase
 
     d = create_driver(CONFIG_BASE + %[
       format tsv
-      process_file_age 5
+      process_file_timedelta 5
       ])
 
-    assert_equal "#{TMP_DIR_FROM}/*", d.instance.instance_variable_get(:@input_path)
+    assert_equal "#{TMP_DIR_FROM}/*", d.instance.instance_variable_get(:@file_path_with_glob)
     assert_equal 'tsv', d.instance.instance_variable_get(:@format)
-    assert_equal 5, d.instance.instance_variable_get(:@process_file_age)
+    assert_equal 5, d.instance.instance_variable_get(:@process_file_timedelta)
   end
 
   def compare_test_result(emits, tests)
@@ -81,7 +81,7 @@ class DestructiveReadInputTest < Test::Unit::TestCase
 
       d = create_driver(CONFIG_BASE + %[
         format #{format}
-        process_file_age 0
+        process_file_timedelta 0
         keys hdfs_path,unixtimestamp,label,message
         ])
       d.run
@@ -107,9 +107,9 @@ class DestructiveReadInputTest < Test::Unit::TestCase
 
     d = create_driver(CONFIG_BASE + %[
       format #{format}
-      process_file_age 0
+      process_file_timedelta 0
       keys hdfs_path,unixtimestamp,label,message
-      processed_file_path #{TMP_DIR_TO}
+      move_to #{TMP_DIR_TO}
       ])
     d.run
 
@@ -140,9 +140,9 @@ class DestructiveReadInputTest < Test::Unit::TestCase
 
     d = create_driver(CONFIG_BASE + %[
       format #{format}
-      process_file_age 0
+      process_file_timedelta 0
       keys hdfs_path,unixtimestamp,label,message
-      processed_file_path #{TMP_DIR_TO}
+      move_to #{TMP_DIR_TO}
       oneline_max_bytes 1
       ])
 
