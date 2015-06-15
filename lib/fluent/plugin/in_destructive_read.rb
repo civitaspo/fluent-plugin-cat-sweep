@@ -74,12 +74,13 @@ module Fluent
 
         Dir.glob(@file_path_with_glob).map do |filename|
           next unless will_process?(filename)
-          processing_filename = get_processing_filename(filename)
 
+          processing_filename = get_processing_filename(filename)
           begin
-            safe_rename(filename, processing_filename)
-            process(processing_filename)
-            after_processing(processing_filename)
+            lock_with_renaming(filename, processing_filename) do
+              process(processing_filename)
+              after_processing(processing_filename)
+            end
           rescue => e
             log.error "in_destructive_read: processing error: #{e}, file: #{processing_filename}",
               :error => e, :error_class => e.class
@@ -119,20 +120,9 @@ module Fluent
       errfile << filename << '.' << @error_file_suffix
     end
 
-    def safe_rename(filename_from, filename_to)
-      file = File.open(filename_from, 'r')
-      begin
-        file.flock(File::LOCK_EX) # exclusive lock
-        File.rename(filename_from, filename_to)
-      ensure
-        file.flock(File::LOCK_UN) # release the lock
-        file.close
-      end
-    end
-
     def safe_fail(filename)
       begin
-        safe_rename(filename, get_error_filename(filename))
+        lock_with_renaming(filename, get_error_filename(filename))
       rescue => e
         log.error "in_destructive_read: rename #{filename} to error name. message: #{e}",
           :error => e, :error_class => e.class
@@ -193,6 +183,21 @@ module Fluent
         read_each_line(tfile) do |line|
           emit_message(line)
         end
+      end
+    end
+
+    def lock_with_renaming(filename_from, filename_to)
+      file = File.open(filename_from)
+      begin
+        if file.flock(File::LOCK_EX | File::LOCK_NB)
+          File.rename(filename_from, filename_to)
+          yield if block_given?
+        else
+          log.warn "in_destructive_read: lock failed: skip #{filename_from}"
+        end
+      ensure
+        file.flock(File::LOCK_UN) # release the lock
+        file.close
       end
     end
 
