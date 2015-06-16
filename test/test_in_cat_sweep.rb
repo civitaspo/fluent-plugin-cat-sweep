@@ -1,8 +1,8 @@
 require_relative 'helper'
 require 'rr'
-require 'fluent/plugin/in_destructive_read'
+require 'fluent/plugin/in_cat_sweep'
 
-class DestructiveReadInputTest < Test::Unit::TestCase
+class CatSweepInputTest < Test::Unit::TestCase
   def setup
     Fluent::Test.setup
     FileUtils.mkdir_p(TMP_DIR_FROM)
@@ -14,15 +14,15 @@ class DestructiveReadInputTest < Test::Unit::TestCase
     FileUtils.rm_r(TMP_DIR_TO)
   end
 
-  TMP_DIR_FROM = '/tmp/fluent_plugin_test_in_destructive_read_from'
-  TMP_DIR_TO   = '/tmp/fluent_plugin_test_in_destructive_read_to'
+  TMP_DIR_FROM = '/tmp/fluent_plugin_test_in_cat_sweep_from'
+  TMP_DIR_TO   = '/tmp/fluent_plugin_test_in_cat_sweep_to'
 
   CONFIG_BASE = %[
     file_path_with_glob #{TMP_DIR_FROM}/*
   ]
 
   def create_driver(conf, use_v1 = true)
-    Fluent::Test::InputTestDriver.new(Fluent::DestructiveReadInput).configure(conf, use_v1)
+    Fluent::Test::InputTestDriver.new(Fluent::CatSweepInput).configure(conf, use_v1)
   end
 
   def test_required_configure

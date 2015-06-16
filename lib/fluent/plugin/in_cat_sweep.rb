@@ -1,7 +1,7 @@
 
 module Fluent
-  class DestructiveReadInput < Input
-    Plugin.register_input('destructive_read', self)
+  class CatSweepInput < Input
+    Plugin.register_input('cat_sweep', self)
 
     class OneLineMaxBytesOverError < StandardError
     end
@@ -12,7 +12,7 @@ module Fluent
     config_param :file_path_with_glob,     :string
     config_param :format,                  :string
     config_param :waiting_seconds,         :integer  # seconds
-    config_param :tag,                     :string,  :default => 'file.destructive_read'
+    config_param :tag,                     :string,  :default => 'file.cat_sweep'
     config_param :processing_file_suffix,  :string,  :default => '.processing'
     config_param :error_file_suffix,       :string,  :default => '.error'
     config_param :line_terminated_by,      :string,  :default => "\n"
@@ -39,19 +39,19 @@ module Fluent
       @parser.configure(conf)
 
       if @processing_file_suffix.empty?
-        raise Fluent::ConfigError, "in_destructive_read: `processing_file_suffix` must has some letters."
+        raise Fluent::ConfigError, "in_cat_sweep: `processing_file_suffix` must has some letters."
       end
 
       if @error_file_suffix.empty?
-        raise Fluent::ConfigError, "in_destructive_read: `error_file_suffix` must has some letters."
+        raise Fluent::ConfigError, "in_cat_sweep: `error_file_suffix` must has some letters."
       end
 
       if @line_terminated_by.empty?
-        raise Fluent::ConfigError, "in_destructive_read: `line_terminated_by` must has some letters."
+        raise Fluent::ConfigError, "in_cat_sweep: `line_terminated_by` must has some letters."
       end
 
       if !remove_file? and !Dir.exists?(@move_to)
-        raise Fluent::ConfigError, "in_destructive_read: `move_to` directory must be existed."
+        raise Fluent::ConfigError, "in_cat_sweep: `move_to` directory must be existed."
       end
 
       @read_bytes_once = 262144 # 256 KB
@@ -82,7 +82,7 @@ module Fluent
               after_processing(processing_filename)
             end
           rescue => e
-            log.error "in_destructive_read: processing error: #{e}, file: #{processing_filename}",
+            log.error "in_cat_sweep: processing error: #{e}, file: #{processing_filename}",
               :error => e, :error_class => e.class
             log.error_backtrace
             safe_fail(processing_filename)
@@ -124,7 +124,7 @@ module Fluent
       begin
         lock_with_renaming(filename, get_error_filename(filename))
       rescue => e
-        log.error "in_destructive_read: rename #{filename} to error name. message: #{e}",
+        log.error "in_cat_sweep: rename #{filename} to error name. message: #{e}",
           :error => e, :error_class => e.class
         log.error_backtrace
       end
@@ -151,7 +151,7 @@ module Fluent
         if buffer.length > @oneline_max_bytes
           begin
             raise OneLineMaxBytesOverError,
-              "in_destructive_read: buffer length is over #{@oneline_max_bytes} bytes. remove: #{buffer}"
+              "in_cat_sweep: buffer length is over #{@oneline_max_bytes} bytes. remove: #{buffer}"
           ensure
             buffer_clean!
           end
@@ -171,7 +171,7 @@ module Fluent
         @parser.parse(message) do |time, record|
           unless time and record
             raise FormatError,
-              "in_destructive_read: pattern not match: #{message.inspect}"
+              "in_cat_sweep: pattern not match: #{message.inspect}"
           end
           router.emit(@tag, time, record)
         end
@@ -193,7 +193,7 @@ module Fluent
           File.rename(filename_from, filename_to)
           yield if block_given?
         else
-          log.warn "in_destructive_read: lock failed: skip #{filename_from}"
+          log.warn "in_cat_sweep: lock failed: skip #{filename_from}"
         end
       ensure
         file.flock(File::LOCK_UN) # release the lock

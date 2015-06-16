@@ -3,15 +3,14 @@ lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
-  spec.name          = "fluent-plugin-destructive-read"
+  spec.name          = "fluent-plugin-cat-sweep"
   spec.version       = "0.0.1"
   spec.authors       = ["Civitaspo(takahiro.nakayama)"]
   spec.email         = ["civitaspo@gmail.com"]
 
-  spec.summary       = %q{Fluentd plugin to read files destructive.}
+  spec.summary       = %q{Fluentd plugin to cat files and move them.}
   spec.description   = spec.summary
-  spec.homepage      = "https://github.dena.jp/takahiro-nakayama/fluent-plugin-destructive-read"
-  # want to make this gem public...
+  spec.homepage      = "https://github.com/civitaspo/fluent-plugin-cat-sweep"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split("\n")
