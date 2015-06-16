@@ -1,6 +1,6 @@
 # fluent-plugin-cat-sweep
 
-[![Build Status](https://secure.travis-ci.org/civitaspo/fluent-plugin-cat-sweep.png?branch=master)](http://travis-ci.org/civitaspo/fluent-plugin-cat-sweep)
+[![Circle CI](https://circleci.com/gh/civitaspo/fluent-plugin-cat-sweep.svg?style=svg)](https://circleci.com/gh/civitaspo/fluent-plugin-cat-sweep) [![Build Status](https://secure.travis-ci.org/civitaspo/fluent-plugin-cat-sweep.png?branch=master)](http://travis-ci.org/civitaspo/fluent-plugin-cat-sweep)
 
 Fluentd plugin to read data from files and to remove or move after processing.
 
