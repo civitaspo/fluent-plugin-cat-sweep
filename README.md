@@ -20,6 +20,23 @@ Or install it yourself as:
 
     $ gem install fluent-plugin-cat-sweep
 
+## Basic Behavior
+
+Assume that an application outputs logs into `/tmp/test` directory as
+
+```
+tmp/test
+├── accesss.log.201509151611
+├── accesss.log.201509151612
+└── accesss.log.201509151613
+```
+
+in every one minute interval. 
+
+This plugin watches the directory (`file_path_with_glob tmp/test/access.log.*`), and reads the contents and sweep (deafault: remove) for files whose mtime are passed in 60 seconds (can be configured with `waiting_seconds`).
+
+Our assumption is that this mechanism should provide more durability than `in_tail` (batch read overcomes than streaming read). 
+
 ## Configuration
 
 ```
