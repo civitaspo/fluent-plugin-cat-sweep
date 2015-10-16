@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name          = "fluent-plugin-cat-sweep"
-  spec.version       = "0.0.1"
+  spec.version       = "0.1.0"
   spec.authors       = ["Civitaspo(takahiro.nakayama)"]
   spec.email         = ["civitaspo@gmail.com"]
 
