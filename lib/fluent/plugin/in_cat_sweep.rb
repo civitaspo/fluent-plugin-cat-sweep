@@ -112,12 +112,12 @@ module Fluent
     def get_processing_filename(filename)
       tmpfile = String.new
       tmpfile << filename << '.' << Process.pid.to_s << '.'
-      tmpfile << Time.now.to_i.to_s << '.' << @processing_file_suffix
+      tmpfile << Time.now.to_i.to_s << @processing_file_suffix
     end
 
     def get_error_filename(filename)
       errfile = String.new
-      errfile << filename << '.' << @error_file_suffix
+      errfile << filename << @error_file_suffix
     end
 
     def safe_fail(filename)
