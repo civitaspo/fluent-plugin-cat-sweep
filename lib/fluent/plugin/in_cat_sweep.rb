@@ -94,10 +94,9 @@ module Fluent
               after_processing(processing_filename)
             end
           rescue => e
-            log.error "in_cat_sweep: processing error: #{e}, file: #{processing_filename}",
-              :error => e, :error_class => e.class
+            log.error "in_cat_sweep: processing: #{processing_filename}", :error => e, :error_class => e.class
             log.error_backtrace
-            safe_fail(processing_filename)
+            safe_fail(e, processing_filename)
           end
         end
       end
@@ -133,16 +132,17 @@ module Fluent
       tmpfile.gsub!(/\.\d+\.\d+$/, '')
     end
 
-    def get_error_filename(filename)
+    def get_error_filename(e, filename)
       errfile = String.new
-      errfile << filename << @error_file_suffix
+      errfile << filename << "." << e.class.to_s << @error_file_suffix
     end
 
-    def safe_fail(filename)
+    def safe_fail(e, filename)
       begin
-        lock_with_renaming(filename, get_error_filename(filename))
+        error_filename = get_error_filename(e, filename)
+        lock_with_renaming(filename, error_filename)
       rescue => e
-        log.error "in_cat_sweep: rename #{filename} to error name. message: #{e}",
+        log.error "in_cat_sweep: rename #{filename} to error filename #{error_filename}",
           :error => e, :error_class => e.class
         log.error_backtrace
       end
