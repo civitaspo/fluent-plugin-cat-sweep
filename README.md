@@ -58,11 +58,11 @@ Our assumption is that this mechanism should provide more durability than `in_ta
   # Optional. default is file.cat_sweep
   tag test.input
 
-  # Optional. processing files is renamed with this suffix. default is .processing
-  processing_file_suffix .processing
+  # Optional. processing files is renamed with this suffix. default is processing
+  processing_file_suffix processing
 
-  # Optional. error files is renamed with this suffix. default is .error
-  error_file_suffix .err
+  # Optional. error files is renamed with this suffix. default is error
+  error_file_suffix err
 
   # Optional. line terminater. default is "\n"
   line_terminated_by ,
