@@ -117,11 +117,11 @@ class CatSweepInputTest < Test::Unit::TestCase
 
     assert(Dir.glob("#{TMP_DIR_FROM}/test_move_file*").empty?)
     assert_match(
-      %r{\A#{TMP_DIR_TO}/test_move_file.*\.processing},
-      Dir.glob("#{TMP_DIR_TO}/test_move_file*").first)
+      %r{\A#{TMP_DIR_TO}#{TMP_DIR_FROM}/test_move_file},
+      Dir.glob("#{TMP_DIR_TO}#{TMP_DIR_FROM}/test_move_file*").first)
     assert_equal(
       test_cases.map{|t|t['msg']}.join.to_s,
-      File.read(Dir.glob("#{TMP_DIR_TO}/test_move_file*").first))
+      File.read(Dir.glob("#{TMP_DIR_TO}#{TMP_DIR_FROM}/test_move_file*").first))
   end
 
   def test_oneline_max_bytes
