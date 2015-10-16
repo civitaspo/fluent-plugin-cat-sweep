@@ -13,8 +13,8 @@ module Fluent
     config_param :format,                  :string
     config_param :waiting_seconds,         :integer  # seconds
     config_param :tag,                     :string,  :default => 'file.cat_sweep'
-    config_param :processing_file_suffix,  :string,  :default => '.processing'
-    config_param :error_file_suffix,       :string,  :default => '.error'
+    config_param :processing_file_suffix,  :string,  :default => 'processing'
+    config_param :error_file_suffix,       :string,  :default => 'error'
     config_param :line_terminated_by,      :string,  :default => "\n"
     config_param :oneline_max_bytes,       :integer, :default => 536870912 # 512MB
     config_param :move_to,                 :string,  :default => '/tmp'
