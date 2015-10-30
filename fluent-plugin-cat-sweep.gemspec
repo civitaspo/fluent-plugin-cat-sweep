@@ -4,9 +4,9 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name          = "fluent-plugin-cat-sweep"
-  spec.version       = "0.1.0"
-  spec.authors       = ["Civitaspo(takahiro.nakayama)"]
-  spec.email         = ["civitaspo@gmail.com"]
+  spec.version       = "0.1.1"
+  spec.authors       = ["Civitaspo(takahiro.nakayama)", "Naotoshi Seo"]
+  spec.email         = ["civitaspo@gmail.com", "sonots@gmail.com"]
 
   spec.summary       = %q{Fluentd plugin to cat files and move them.}
   spec.description   = spec.summary
