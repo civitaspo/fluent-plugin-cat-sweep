@@ -90,7 +90,7 @@ module Fluent
           processing_filename = get_processing_filename(filename)
           begin
             lock_with_renaming(filename, processing_filename) do
-              process(processing_filename)
+              process(filename, processing_filename)
               after_processing(processing_filename)
             end
           rescue => e
@@ -196,11 +196,12 @@ module Fluent
       end
     end
 
-    def process(filename)
-      File.open(filename, 'r') do |tfile|
+    def process(original_filename, processing_filename)
+      File.open(processing_filename, 'r') do |tfile|
         read_each_line(tfile) do |line|
           emit_message(line)
         end
+        log.debug { %[in_cat_sweep: process: {filename:"#{original_filename}",size:#{tfile.size}}] }
       end
     end
 
