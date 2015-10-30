@@ -84,6 +84,10 @@ Our assumption is that this mechanism should provide more durability than `in_ta
 </source>
 ```
 
+## ChangeLog
+
+[CHANGELOG.md](CHANGELOG.md)
+
 ## Contributing
 
 1. Fork it ( https://github.com/civitaspo/fluent-plugin-cat-sweep/fork )
