@@ -19,7 +19,7 @@ module Fluent
     config_param :oneline_max_bytes,       :integer, :default => 536870912 # 512MB
     config_param :move_to,                 :string,  :default => '/tmp'
     config_param :remove_after_processing, :bool,    :default => false
-    config_param :run_interval,            :integer, :default => 5
+    config_param :run_interval,            :time,    :default => 5
     config_param :file_event_stream,       :bool,    :default => false
 
     # To support log_level option implemented by Fluentd v0.10.43
