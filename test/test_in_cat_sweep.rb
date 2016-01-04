@@ -19,6 +19,7 @@ class CatSweepInputTest < Test::Unit::TestCase
 
   CONFIG_BASE = %[
     file_path_with_glob #{TMP_DIR_FROM}/*
+    run_interval 0.05
   ]
 
   CONFIG_MINIMUM_REQUIRED = CONFIG_BASE + %[
