@@ -21,6 +21,11 @@ class CatSweepInputTest < Test::Unit::TestCase
     file_path_with_glob #{TMP_DIR_FROM}/*
   ]
 
+  CONFIG_MINIMUM_REQUIRED = CONFIG_BASE + %[
+    format tsv
+    waiting_seconds 5
+  ]
+
   def create_driver(conf, use_v1 = true)
     Fluent::Test::InputTestDriver.new(Fluent::CatSweepInput).configure(conf, use_v1)
   end
@@ -38,19 +43,24 @@ class CatSweepInputTest < Test::Unit::TestCase
       d = create_driver(CONFIG_BASE + %[format tsv])
     end
 
-    d = create_driver(CONFIG_BASE + %[
-      format tsv
-      waiting_seconds 5
-      ])
+    d = create_driver(CONFIG_MINIMUM_REQUIRED)
 
     assert_equal "#{TMP_DIR_FROM}/*", d.instance.instance_variable_get(:@file_path_with_glob)
     assert_equal 'tsv', d.instance.instance_variable_get(:@format)
     assert_equal 5, d.instance.instance_variable_get(:@waiting_seconds)
   end
 
+  def test_configure_file_event_stream
+    d = create_driver(CONFIG_MINIMUM_REQUIRED)
+    assert { false == d.instance.file_event_stream }
+
+    d = create_driver(CONFIG_MINIMUM_REQUIRED + %[file_event_stream true])
+    assert { true == d.instance.file_event_stream }
+  end
+
   def compare_test_result(emits, tests)
     emits.each_index do |i|
-      assert_equal(tests[i]['expected'], emits[i][2]['message'])
+      assert { tests[i]['expected'] == emits[i][2]['message'] }
     end
   end
 
@@ -70,24 +80,27 @@ class CatSweepInputTest < Test::Unit::TestCase
       ]
     }
 
-  TEST_CASES.each do |format, test_cases|
-    test_case_name = "test_msg_process_#{format}"
-    define_method(test_case_name) do
-      File.open("#{TMP_DIR_FROM}/#{test_case_name}", 'w') do |io|
-        test_cases.each do |test|
-          io.write(test['msg'])
+  [false, true].each do |file_event_stream|
+    TEST_CASES.each do |format, test_cases|
+      test_case_name = "test_msg_process_#{format}_file_event_stream_#{file_event_stream}"
+      define_method(test_case_name) do
+        File.open("#{TMP_DIR_FROM}/#{test_case_name}", 'w') do |io|
+          test_cases.each do |test|
+            io.write(test['msg'])
+          end
         end
+
+        d = create_driver(CONFIG_BASE + %[
+          format #{format}
+          file_event_stream #{file_event_stream}
+          waiting_seconds 0
+          keys hdfs_path,unixtimestamp,label,message
+          ])
+        d.run
+
+        compare_test_result(d.emits, test_cases)
+        assert { Dir.glob("#{TMP_DIR_FROM}/#{test_case_name}*").empty? }
       end
-
-      d = create_driver(CONFIG_BASE + %[
-        format #{format}
-        waiting_seconds 0
-        keys hdfs_path,unixtimestamp,label,message
-        ])
-      d.run
-
-      compare_test_result(d.emits, test_cases)
-      assert(Dir.glob("#{TMP_DIR_FROM}/#{test_case_name}*").empty?)
     end
   end
 
