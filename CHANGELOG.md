@@ -1,3 +1,10 @@
+# 0.1.2
+
+Enhancements:
+
+* Add file_event_stream option
+* Speedup test
+
 # 0.1.1
 
 Enhancements:
