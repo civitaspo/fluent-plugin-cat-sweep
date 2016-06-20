@@ -1,4 +1,5 @@
 require 'test/unit'
+require 'fluent/version'
 require 'fluent/log'
 require 'fluent/test'
 

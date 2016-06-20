@@ -1,5 +1,6 @@
 require_relative 'helper'
 require 'rr'
+require 'fluent/input'
 require 'fluent/plugin/in_cat_sweep'
 
 class CatSweepInputTest < Test::Unit::TestCase
