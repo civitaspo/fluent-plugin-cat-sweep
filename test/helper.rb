@@ -26,3 +26,12 @@ module Fluent
     end
   end
 end
+
+
+def current_fluent_version
+  fluent_version(Fluent::VERSION)
+end
+
+def fluent_version(v)
+  Gem::Version.new(v)
+end

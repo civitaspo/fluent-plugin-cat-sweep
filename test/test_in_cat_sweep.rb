@@ -22,14 +22,23 @@ class CatSweepInputTest < Test::Unit::TestCase
     run_interval 0.05
   ]
 
-  CONFIG_MINIMUM_REQUIRED = CONFIG_BASE + %[
-    format tsv
-    waiting_seconds 5
-  ]
+  CONFIG_MINIMUM_REQUIRED =
+    if current_fluent_version < fluent_version('0.12.0')
+      CONFIG_BASE + %[
+        format tsv
+        keys ""
+        waiting_seconds 5
+      ]
+    else
+      CONFIG_BASE + %[
+        format tsv
+        waiting_seconds 5
+      ]
+    end
 
   def create_driver(conf, use_v1 = true)
     driver = Fluent::Test::InputTestDriver.new(Fluent::CatSweepInput)
-    if driver.method(:configure).parameters.size == 1 # Support lower version of fluentd than v0.10.51
+    if current_fluent_version < fluent_version('0.10.51')
       driver.configure(conf)
     else
       driver.configure(conf, use_v1)
