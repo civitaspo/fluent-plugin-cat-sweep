@@ -28,7 +28,13 @@ class CatSweepInputTest < Test::Unit::TestCase
   ]
 
   def create_driver(conf, use_v1 = true)
-    Fluent::Test::InputTestDriver.new(Fluent::CatSweepInput).configure(conf, use_v1)
+    driver = Fluent::Test::InputTestDriver.new(Fluent::CatSweepInput)
+    if driver.method(:configure).parameters.size == 1 # Support lower version of fluentd than v0.10.51
+      driver.configure(conf)
+    else
+      driver.configure(conf, use_v1)
+    end
+    driver
   end
 
   def test_required_configure
