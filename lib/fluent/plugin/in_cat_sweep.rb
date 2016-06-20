@@ -35,8 +35,7 @@ module Fluent
     def configure(conf)
       super
 
-      @parser = Plugin.new_parser(@format)
-      @parser.configure(conf)
+      configure_parser(conf)
 
       if @processing_file_suffix.empty?
         raise Fluent::ConfigError, "in_cat_sweep: `processing_file_suffix` must has some letters."
@@ -103,6 +102,18 @@ module Fluent
     end
 
     private
+
+    def configure_parser(conf)
+      @parser =
+        if Plugin.respond_to?(:new_parser)
+          Plugin.new_parser(@format)
+        else
+          # For supporting fluentd v0.10.45
+          TextParser.new
+        end
+
+      @parser.configure(conf)
+    end
 
     def will_process?(filename)
       !(processing?(filename) or error_file?(filename) or sufficient_waiting?(filename))
