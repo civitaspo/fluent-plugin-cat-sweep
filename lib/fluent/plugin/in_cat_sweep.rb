@@ -109,6 +109,9 @@ module Fluent
         @parser.configure(conf)
       else # For supporting fluentd lower than v0.10.58
         @parser = TextParser.new
+        # The default behavior follows fluentd v0.14
+        # cf. https://github.com/fluent/fluentd/blob/v0.14.0.rc.3/lib/fluent/plugin/parser.rb#L172
+        conf['keys'] = '' unless conf['keys']
         @parser.configure(conf)
         # In lower version of fluentd than v0.10.50,
         # `Fluent::Parser#parse` cannot be given a block argument.
