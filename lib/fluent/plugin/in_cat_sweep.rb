@@ -111,12 +111,12 @@ module Fluent
         @parser = TextParser.new
         @parser.configure(conf)
         # In lower version of fluentd than v0.10.50,
-        # `Fluent::Parser#parse` cannot be given a block argument.
-        # cf. https://github.com/fluent/fluentd/blob/v0.10.45/lib/fluent/parser.rb#L294
+        # `Fluent::Parser#parse` does not support block based API.
+        # cf. https://github.com/fluent/fluentd/blob/v0.10.49/lib/fluent/parser.rb#L270
         # On the other hand, in newer version(like v0.14) of fluentd,
-        # `Fluent::Parser#parse` cannot be called without a block argument.
+        # `Fluent::Parser#parse` only supports block based API.
         # cf. https://github.com/fluent/fluentd/blob/v0.14.0.rc.3/lib/fluent/plugin/parser_tsv.rb#L33
-        # So, lower version of `Fluent::Parser#parse` extends the way to call by using a block argument.
+        # So, lower version of `Fluent::Parser#parse` extends the way to call by block based API.
         @parser.extend(Module.new {
           def parse(line)
             time, record = super
