@@ -1,3 +1,10 @@
+# 0.1.3
+
+Enhancements:
+
+* Supported fluentd versions fixed (from fluentd v0.10.45)
+* Add messages for end of support fluentd version
+
 # 0.1.2
 
 Enhancements:
