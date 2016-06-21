@@ -35,8 +35,10 @@ module Fluent
     def configure(conf)
       super
 
-      @parser = Plugin.new_parser(@format)
-      @parser.configure(conf)
+      # Message for users about supported fluentd versions
+      supported_versions_information
+
+      configure_parser(conf)
 
       if @processing_file_suffix.empty?
         raise Fluent::ConfigError, "in_cat_sweep: `processing_file_suffix` must has some letters."
@@ -103,6 +105,56 @@ module Fluent
     end
 
     private
+
+    def configure_parser(conf)
+      if Plugin.respond_to?(:new_parser)
+        @parser = Plugin.new_parser(@format)
+        @parser.configure(conf)
+      else # For supporting fluentd lower than v0.10.58
+        @parser = TextParser.new
+        @parser.configure(conf)
+        # In lower version of fluentd than v0.10.50,
+        # `Fluent::Parser#parse` does not support block based API.
+        # cf. https://github.com/fluent/fluentd/blob/v0.10.49/lib/fluent/parser.rb#L270
+        # On the other hand, in newer version(like v0.14) of fluentd,
+        # `Fluent::Parser#parse` only supports block based API.
+        # cf. https://github.com/fluent/fluentd/blob/v0.14.0.rc.3/lib/fluent/plugin/parser_tsv.rb#L33
+        # So, lower version of `Fluent::Parser#parse` extends the way to call by block based API.
+        @parser.extend(Module.new {
+          def parse(line)
+            time, record = super
+            yield(time, record)
+            return
+          end
+        })
+      end
+    end
+
+    def supported_versions_information
+      if current_fluent_version < fluent_version('0.12.0')
+        log.warn "in_cat_sweep: the support for fluentd v0.10 will end near future. Please upgrade your fluentd or fix this plugin version."
+      end
+      if current_fluent_version < fluent_version('0.10.58')
+        log.warn "in_cat_sweep: fluentd officially supports Plugin.new_parser/Plugin.register_parser APIs from v0.10.58." \
+          " The support for v0.10.58 will end near future." \
+          " Please upgrade your fluentd or fix this plugin version."
+      end
+      if current_fluent_version < fluent_version('0.10.46')
+        log.warn "in_cat_sweep: fluentd officially supports parser plugin from v0.10.46." \
+          " If you use `time_key` parameter and fluentd v0.10.45, doesn't work properly." \
+          " The support for v0.10.45 will end near future." \
+          " Please upgrade your fluentd or fix this plugin version."
+      end
+    end
+
+    def current_fluent_version
+      parse_version_comparable(Fluent::VERSION)
+    end
+    
+    def parse_version_comparable(v)
+      Gem::Version.new(v)
+    end
+    alias :fluent_version :parse_version_comparable # For the readability
 
     def will_process?(filename)
       !(processing?(filename) or error_file?(filename) or sufficient_waiting?(filename))

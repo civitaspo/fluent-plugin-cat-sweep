@@ -1,5 +1,6 @@
 require_relative 'helper'
 require 'rr'
+require 'fluent/input'
 require 'fluent/plugin/in_cat_sweep'
 
 class CatSweepInputTest < Test::Unit::TestCase
@@ -22,13 +23,28 @@ class CatSweepInputTest < Test::Unit::TestCase
     run_interval 0.05
   ]
 
-  CONFIG_MINIMUM_REQUIRED = CONFIG_BASE + %[
-    format tsv
-    waiting_seconds 5
-  ]
+  CONFIG_MINIMUM_REQUIRED =
+    if current_fluent_version < fluent_version('0.12.0')
+      CONFIG_BASE + %[
+        format tsv
+        keys ""
+        waiting_seconds 5
+      ]
+    else
+      CONFIG_BASE + %[
+        format tsv
+        waiting_seconds 5
+      ]
+    end
 
   def create_driver(conf, use_v1 = true)
-    Fluent::Test::InputTestDriver.new(Fluent::CatSweepInput).configure(conf, use_v1)
+    driver = Fluent::Test::InputTestDriver.new(Fluent::CatSweepInput)
+    if current_fluent_version < fluent_version('0.10.51')
+      driver.configure(conf)
+    else
+      driver.configure(conf, use_v1)
+    end
+    driver
   end
 
   def test_required_configure
