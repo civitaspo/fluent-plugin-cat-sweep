@@ -93,6 +93,12 @@ Our assumption is that this mechanism should provide more durability than `in_ta
 
 [CHANGELOG.md](CHANGELOG.md)
 
+## Warning
+
+* This plugin supports fluentd from v0.10.45
+* The support for fluentd v0.10 will end near future
+* The support for fluentd v0.14 is not yet
+
 ## Contributing
 
 1. Fork it ( https://github.com/civitaspo/fluent-plugin-cat-sweep/fork )
