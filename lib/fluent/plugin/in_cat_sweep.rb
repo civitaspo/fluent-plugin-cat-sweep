@@ -237,7 +237,7 @@ module Fluent
     end
 
     def emit_line(line)
-      if line
+      if line && line.length > 0
         time, record = parse_line(line)
         if time and record
           router.emit(@tag, time, record)
@@ -248,7 +248,7 @@ module Fluent
     def emit_file(fp)
       entries = []
       read_each_line(fp) do |line|
-        if line
+        if line && line.length > 0
           entry = parse_line(line)
           entries << entry if entry
         end

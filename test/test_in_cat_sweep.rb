@@ -94,6 +94,7 @@ class CatSweepInputTest < Test::Unit::TestCase
       'json' => [
         {'msg' => {'k' => 123, 'message' => 'tcptest1'}.to_json + "\n", 'expected' => 'tcptest1'},
         {'msg' => {'k' => 'tcptest2', 'message' => 456}.to_json + "\n", 'expected' => 456},
+        {'msg' => "\n", 'expected' => ''},
       ]
     }
 
