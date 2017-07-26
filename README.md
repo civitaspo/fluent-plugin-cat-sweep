@@ -37,6 +37,76 @@ This plugin watches the directory (`file_path_with_glob tmp/test/access.log.*`),
 
 Our assumption is that this mechanism should provide more durability than `in_tail` (batch read overcomes than streaming read). 
 
+## Potential problem of in_tail
+
+Assume that an application outputs logs into `/tmp/test/access.log` and rotates it in every one minute interval as
+
+(initial state)
+
+```
+tmp/test
+└── accesss.log (i-node 4478316)
+```
+
+(one minute later)
+
+```
+tmp/test
+├── accesss.log (i-node 4478319)
+└── accesss.log.1 (i-node 4478316)
+```
+
+(two minutes later)
+
+```
+tmp/test
+├── accesss.log (i-node 4478322)
+├── accesss.log.1 (i-node 4478319)
+└── accesss.log.2 (i-node 4478316)
+```
+
+Your configuration of `in_tail` may become as followings:
+
+```apache
+<source>
+  @type tail
+  path tmp/test/access.log
+  pos_file /var/log/td-agent/access.log.pos
+  tag access
+  format none
+</source>
+```
+
+Now, imagine that the fluentd process dies (or manually stops for maintenance) just before the 2nd file of i-node 4478319 is generated, and you restart the fluentd process after two minutes passed. Then, you miss the 2nd file of i-node 4478319.
+
+(initial state)
+
+```
+tmp/test
+└── accesss.log (i-node 4478316) <= catch
+```
+
+(fluentd dies)
+
+(one minute later)
+
+```
+tmp/test
+├── accesss.log (i-node 4478319) <= miss
+└── accesss.log.1 (i-node 4478316)
+```
+
+(two minutes later)
+
+(fluentd restarts)
+
+```
+tmp/test
+├── accesss.log (i-node 4478322) <= catch
+├── accesss.log.1 (i-node 4478319) <= miss
+└── accesss.log.2 (i-node 4478316)
+```
+
 ## Configuration
 
 ```
