@@ -1,10 +1,17 @@
 language: ruby
 rvm:
-  - 1.9.3
-  - 2.0.0
   - 2.1.*
   - 2.2.*
+  - '2.3'
+  - '2.4'
 gemfile:
   - gemfiles/Gemfile.fluentd.0.12
   - gemfiles/Gemfile.fluentd.0.10
   - gemfiles/Gemfile.fluentd.0.10.45
+
+matrix:
+  exclude:
+    - rvm: '2.4'
+      gemfile: gemfiles/Gemfile.fluentd.0.10
+    - rvm: '2.4'
+      gemfile: gemfiles/Gemfile.fluentd.0.10.45
