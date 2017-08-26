@@ -24,7 +24,8 @@ class CatSweepInputTest < Test::Unit::TestCase
   ]
 
   CONFIG_MINIMUM_REQUIRED =
-    if current_fluent_version < fluent_version('0.12.0')
+    if current_fluent_version < fluent_version('0.12.0') ||
+       current_fluent_version >= fluent_version('0.14.0')
       CONFIG_BASE + %[
         format tsv
         keys ""
