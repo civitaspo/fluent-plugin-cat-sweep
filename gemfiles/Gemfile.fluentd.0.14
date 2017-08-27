@@ -1,0 +1,4 @@
+source "http://rubygems.org"
+
+gem 'fluentd', '~> 0.14.0'
+gemspec :path => "../"
