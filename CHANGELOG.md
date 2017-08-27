@@ -1,3 +1,10 @@
+# 0.1.4
+
+Enhancements:
+
+* Support Fluentd 0.14 with compatibility API.
+  * https://github.com/civitaspo/fluent-plugin-cat-sweep/pull/17 ( by @cosmo0920 )
+
 # 0.1.3
 
 Enhancements:
