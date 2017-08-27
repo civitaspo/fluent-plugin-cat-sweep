@@ -167,7 +167,6 @@ tmp/test
 
 * This plugin supports fluentd from v0.10.45
 * The support for fluentd v0.10 will end near future
-* The support for fluentd v0.14 is not yet
 
 ## Contributing
 
