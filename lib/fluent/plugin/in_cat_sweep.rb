@@ -289,7 +289,7 @@ module Fluent
     end
 
     def lock_with_renaming(filename_from, filename_to)
-      file = File.open(filename_from)
+      file = File.open(filename_from, "r+")
       begin
         if file.flock(File::LOCK_EX | File::LOCK_NB)
           File.rename(filename_from, filename_to)
