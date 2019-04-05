@@ -156,6 +156,10 @@ tmp/test
   # This assures that fluentd emits the entire file contents together. Please note that buffer_chunk_limit
   # must be larger than bytes in a file to be sent by buffered output plugins such as out_forward, out_s3.
   file_event_stream false
+
+  # Optional. When doing flock files, open these files with "r+" mode if this option is true, nor with "r" mode.
+  # default is false.
+  flock_with_rw_mode false
 </source>
 ```
 

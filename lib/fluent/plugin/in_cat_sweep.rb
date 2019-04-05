@@ -22,6 +22,7 @@ module Fluent
     config_param :remove_after_processing, :bool,    :default => false
     config_param :run_interval,            :time,    :default => 5
     config_param :file_event_stream,       :bool,    :default => false
+    config_param :flock_with_rw_mode,      :bool,    :default => false
 
     # To support log_level option implemented by Fluentd v0.10.43
     unless method_defined?(:log)
@@ -288,8 +289,13 @@ module Fluent
       end
     end
 
+    def open_mode_for_flock
+      # When doing flock files on NFS, these files must be opend with writable mode.
+      @open_mode_for_flock ||= @flock_with_rw_mode ? "r+" : "r"
+    end
+
     def lock_with_renaming(filename_from, filename_to)
-      file = File.open(filename_from)
+      file = File.open(filename_from, open_mode_for_flock)
       begin
         if file.flock(File::LOCK_EX | File::LOCK_NB)
           File.rename(filename_from, filename_to)
