@@ -4,6 +4,8 @@ rvm:
   - 2.2.*
   - '2.3'
   - '2.4'
+  - '2.5'
+  - '2.6'
 gemfile:
   - gemfiles/Gemfile.fluentd.0.14
   - gemfiles/Gemfile.fluentd.0.12
@@ -15,4 +17,12 @@ matrix:
     - rvm: '2.4'
       gemfile: gemfiles/Gemfile.fluentd.0.10
     - rvm: '2.4'
+      gemfile: gemfiles/Gemfile.fluentd.0.10.45
+    - rvm: '2.5'
+      gemfile: gemfiles/Gemfile.fluentd.0.10
+    - rvm: '2.5'
+      gemfile: gemfiles/Gemfile.fluentd.0.10.45
+    - rvm: '2.6'
+      gemfile: gemfiles/Gemfile.fluentd.0.10
+    - rvm: '2.6'
       gemfile: gemfiles/Gemfile.fluentd.0.10.45
