@@ -1,3 +1,9 @@
+# 0.1.5
+
+Enhancements:
+
+* Support NFS.
+
 # 0.1.4
 
 Enhancements:
