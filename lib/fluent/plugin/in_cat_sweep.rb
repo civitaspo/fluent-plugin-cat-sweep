@@ -1,8 +1,12 @@
-require 'fluent/input'
+require 'fluent/engine'
+require 'fluent/plugin/input'
+require 'fluent/compat/parser'
 
-module Fluent
-  class CatSweepInput < Input
-    Plugin.register_input('cat_sweep', self)
+module Fluent::Plugin
+  class CatSweepInput < Fluent::Plugin::Input
+    Fluent::Plugin.register_input('cat_sweep', self)
+
+    helpers :compat_parameters, :parser
 
     class OneLineMaxBytesOverError < StandardError
     end
@@ -11,7 +15,6 @@ module Fluent
     end
 
     config_param :file_path_with_glob,     :string
-    config_param :format,                  :string
     config_param :waiting_seconds,         :integer  # seconds
     config_param :tag,                     :string,  :default => 'file.cat_sweep'
     config_param :processing_file_suffix,  :string,  :default => '.processing'
@@ -35,6 +38,7 @@ module Fluent
     end
 
     def configure(conf)
+      compat_parameters_convert(conf, :parser, :buffer, :extract, default_chunk_key: "time")
       super
 
       # Message for users about supported fluentd versions
@@ -64,7 +68,7 @@ module Fluent
         else
           begin
             FileUtils.mkdir_p(dirname)
-          rescue => e
+          rescue
             raise Fluent::ConfigError, "in_cat_sweep: `move_to` directory (#{dirname}) must be writable."
           end
         end
@@ -75,6 +79,8 @@ module Fluent
     end
 
     def start
+      super
+
       @processing = true
       @thread = Thread.new(&method(:run_periodic))
     end
@@ -82,6 +88,8 @@ module Fluent
     def shutdown
       @processing = false
       @thread.join
+
+      super
     end
 
     def run_periodic
@@ -109,27 +117,7 @@ module Fluent
     private
 
     def configure_parser(conf)
-      if Plugin.respond_to?(:new_parser)
-        @parser = Plugin.new_parser(@format)
-        @parser.configure(conf)
-      else # For supporting fluentd lower than v0.10.58
-        @parser = TextParser.new
-        @parser.configure(conf)
-        # In lower version of fluentd than v0.10.50,
-        # `Fluent::Parser#parse` does not support block based API.
-        # cf. https://github.com/fluent/fluentd/blob/v0.10.49/lib/fluent/parser.rb#L270
-        # On the other hand, in newer version(like v0.14) of fluentd,
-        # `Fluent::Parser#parse` only supports block based API.
-        # cf. https://github.com/fluent/fluentd/blob/v0.14.0.rc.3/lib/fluent/plugin/parser_tsv.rb#L33
-        # So, lower version of `Fluent::Parser#parse` extends the way to call by block based API.
-        @parser.extend(Module.new {
-          def parse(line)
-            time, record = super
-            yield(time, record)
-            return
-          end
-        })
-      end
+      @parser = parser_create()
     end
 
     def supported_versions_information
@@ -152,7 +140,7 @@ module Fluent
     def current_fluent_version
       parse_version_comparable(Fluent::VERSION)
     end
-    
+
     def parse_version_comparable(v)
       Gem::Version.new(v)
     end
@@ -171,13 +159,13 @@ module Fluent
     end
 
     def sufficient_waiting?(filename)
-      (Time.now - File.mtime(filename)).to_i < @waiting_seconds
+      (Time.at(Fluent::EventTime.now.to_r) - File.mtime(filename)).to_i < @waiting_seconds
     end
 
     def get_processing_filename(filename)
       tmpfile = String.new
       tmpfile << filename << '.' << Process.pid.to_s << '.'
-      tmpfile << Time.now.to_i.to_s << @processing_file_suffix
+      tmpfile << Fluent::EventTime.now.to_s << @processing_file_suffix
     end
 
     def revert_processing_filename(processing_filename)
@@ -256,7 +244,7 @@ module Fluent
         end
       end
       unless entries.empty?
-        es = ArrayEventStream.new(entries)
+        es = Fluent::ArrayEventStream.new(entries)
         router.emit_stream(@tag, es)
       end
     end

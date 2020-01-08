@@ -7,22 +7,13 @@ rvm:
   - '2.5'
   - '2.6'
 gemfile:
+  - gemfiles/Gemfile.fluentd.1.8
+  - gemfiles/Gemfile.fluentd.1.7
+  - gemfiles/Gemfile.fluentd.1.6
+  - gemfiles/Gemfile.fluentd.1.5
+  - gemfiles/Gemfile.fluentd.1.4
+  - gemfiles/Gemfile.fluentd.1.3
+  - gemfiles/Gemfile.fluentd.1.2
+  - gemfiles/Gemfile.fluentd.1.1
+  - gemfiles/Gemfile.fluentd.1.0
   - gemfiles/Gemfile.fluentd.0.14
-  - gemfiles/Gemfile.fluentd.0.12
-  - gemfiles/Gemfile.fluentd.0.10
-  - gemfiles/Gemfile.fluentd.0.10.45
-
-matrix:
-  exclude:
-    - rvm: '2.4'
-      gemfile: gemfiles/Gemfile.fluentd.0.10
-    - rvm: '2.4'
-      gemfile: gemfiles/Gemfile.fluentd.0.10.45
-    - rvm: '2.5'
-      gemfile: gemfiles/Gemfile.fluentd.0.10
-    - rvm: '2.5'
-      gemfile: gemfiles/Gemfile.fluentd.0.10.45
-    - rvm: '2.6'
-      gemfile: gemfiles/Gemfile.fluentd.0.10
-    - rvm: '2.6'
-      gemfile: gemfiles/Gemfile.fluentd.0.10.45
