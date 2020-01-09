@@ -1,9 +1,10 @@
 require_relative 'helper'
 require 'rr'
-require 'fluent/input'
 require 'fluent/plugin/in_cat_sweep'
 
 class CatSweepInputTest < Test::Unit::TestCase
+  include Fluent::Test::Helpers
+
   def setup
     Fluent::Test.setup
     FileUtils.mkdir_p(TMP_DIR_FROM)
@@ -24,48 +25,54 @@ class CatSweepInputTest < Test::Unit::TestCase
   ]
 
   CONFIG_MINIMUM_REQUIRED =
-    if current_fluent_version < fluent_version('0.12.0') ||
-       current_fluent_version >= fluent_version('0.14.0')
-      CONFIG_BASE + %[
-        format tsv
+    CONFIG_BASE + %[
+      <parse>
+        @type tsv
         keys ""
-        waiting_seconds 5
-      ]
-    else
-      CONFIG_BASE + %[
-        format tsv
-        waiting_seconds 5
-      ]
-    end
+      </parse>
+      waiting_seconds 3
+    ]
 
-  def create_driver(conf, use_v1 = true)
-    driver = Fluent::Test::InputTestDriver.new(Fluent::CatSweepInput)
-    if current_fluent_version < fluent_version('0.10.51')
-      driver.configure(conf)
-    else
-      driver.configure(conf, use_v1)
-    end
-    driver
+  CONFIG_MINIMUM_REQUIRED_IN_OLD_STYLE =
+    CONFIG_BASE + %[
+      format tsv
+      keys ""
+      waiting_seconds 4
+    ]
+
+  def create_driver(conf)
+    Fluent::Test::Driver::Input.new(Fluent::Plugin::CatSweepInput).configure(conf)
   end
 
   def test_required_configure
     assert_raise(Fluent::ConfigError) do
-      d = create_driver(%[])
+      create_driver(%[])
     end
 
     assert_raise(Fluent::ConfigError) do
-      d = create_driver(CONFIG_BASE)
+      create_driver(CONFIG_BASE)
     end
 
     assert_raise(Fluent::ConfigError) do
-      d = create_driver(CONFIG_BASE + %[format tsv])
+      create_driver(CONFIG_BASE + %[
+        <parse>
+          @type tsv
+          keys ""
+        </parse>
+      ])
     end
 
     d = create_driver(CONFIG_MINIMUM_REQUIRED)
 
     assert_equal "#{TMP_DIR_FROM}/*", d.instance.instance_variable_get(:@file_path_with_glob)
-    assert_equal 'tsv', d.instance.instance_variable_get(:@format)
-    assert_equal 5, d.instance.instance_variable_get(:@waiting_seconds)
+    assert_equal Fluent::Plugin::TSVParser, d.instance.instance_variable_get(:@parser).class
+    assert_equal 3, d.instance.instance_variable_get(:@waiting_seconds)
+
+    d = create_driver(CONFIG_MINIMUM_REQUIRED_IN_OLD_STYLE)
+
+    assert_equal "#{TMP_DIR_FROM}/*", d.instance.instance_variable_get(:@file_path_with_glob)
+    assert_equal Fluent::Plugin::TSVParser, d.instance.instance_variable_get(:@parser).class
+    assert_equal 4, d.instance.instance_variable_get(:@waiting_seconds)
   end
 
   def test_configure_file_event_stream
@@ -76,9 +83,9 @@ class CatSweepInputTest < Test::Unit::TestCase
     assert { true == d.instance.file_event_stream }
   end
 
-  def compare_test_result(emits, tests)
-    emits.each_index do |i|
-      assert { tests[i]['expected'] == emits[i][2]['message'] }
+  def compare_test_result(events, tests)
+    events.each_index do |i|
+      assert { tests[i]['expected'] == events[i][2]['message'] }
     end
   end
 
@@ -114,9 +121,9 @@ class CatSweepInputTest < Test::Unit::TestCase
           waiting_seconds 0
           keys hdfs_path,unixtimestamp,label,message
           ])
-        d.run
+        d.run(timeout: 1, expect_records: 2) # timeout = waiting_seconds + 1
 
-        compare_test_result(d.emits, test_cases)
+        compare_test_result(d.events, test_cases)
         assert { Dir.glob("#{TMP_DIR_FROM}/#{test_case_name}*").empty? }
       end
     end
@@ -142,9 +149,9 @@ class CatSweepInputTest < Test::Unit::TestCase
       keys hdfs_path,unixtimestamp,label,message
       move_to #{TMP_DIR_TO}
       ])
-    d.run
+    d.run(timeout: 1, expect_records: 2) # timeout = waiting_seconds + 1
 
-    compare_test_result(d.emits, test_cases)
+    compare_test_result(d.events, test_cases)
 
     assert(Dir.glob("#{TMP_DIR_FROM}/test_move_file*").empty?)
     assert_match(
@@ -177,7 +184,7 @@ class CatSweepInputTest < Test::Unit::TestCase
       oneline_max_bytes 1
       ])
 
-    d.run
+    d.run(timeout: 1, expect_records: 2) # timeout = waiting_seconds + 1
 
     assert_match(
       %r{\A#{TMP_DIR_FROM}/test_oneline_max_bytes.*\.error},
