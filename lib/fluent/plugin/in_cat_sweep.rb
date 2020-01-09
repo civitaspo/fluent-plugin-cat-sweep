@@ -27,22 +27,9 @@ module Fluent::Plugin
     config_param :file_event_stream,       :bool,    :default => false
     config_param :flock_with_rw_mode,      :bool,    :default => false
 
-    # To support log_level option implemented by Fluentd v0.10.43
-    unless method_defined?(:log)
-      define_method("log") { $log }
-    end
-
-    # Define `router` method of v0.12 to support v0.10 or earlier
-    unless method_defined?(:router)
-      define_method("router") { Fluent::Engine }
-    end
-
     def configure(conf)
       compat_parameters_convert(conf, :parser, :buffer, :extract, default_chunk_key: "time")
       super
-
-      # Message for users about supported fluentd versions
-      supported_versions_information
 
       configure_parser(conf)
 
@@ -119,32 +106,6 @@ module Fluent::Plugin
     def configure_parser(conf)
       @parser = parser_create()
     end
-
-    def supported_versions_information
-      if current_fluent_version < fluent_version('0.12.0')
-        log.warn "in_cat_sweep: the support for fluentd v0.10 will end near future. Please upgrade your fluentd or fix this plugin version."
-      end
-      if current_fluent_version < fluent_version('0.10.58')
-        log.warn "in_cat_sweep: fluentd officially supports Plugin.new_parser/Plugin.register_parser APIs from v0.10.58." \
-          " The support for v0.10.58 will end near future." \
-          " Please upgrade your fluentd or fix this plugin version."
-      end
-      if current_fluent_version < fluent_version('0.10.46')
-        log.warn "in_cat_sweep: fluentd officially supports parser plugin from v0.10.46." \
-          " If you use `time_key` parameter and fluentd v0.10.45, doesn't work properly." \
-          " The support for v0.10.45 will end near future." \
-          " Please upgrade your fluentd or fix this plugin version."
-      end
-    end
-
-    def current_fluent_version
-      parse_version_comparable(Fluent::VERSION)
-    end
-
-    def parse_version_comparable(v)
-      Gem::Version.new(v)
-    end
-    alias :fluent_version :parse_version_comparable # For the readability
 
     def will_process?(filename)
       !(processing?(filename) or error_file?(filename) or sufficient_waiting?(filename))
