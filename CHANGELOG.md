@@ -1,3 +1,11 @@
+# 0.2.0
+
+Breaking Changes:
+
+* Use v1.0 API.
+  * Drop support for Fluentd versions smaller than v0.14.
+  * https://github.com/civitaspo/fluent-plugin-cat-sweep/pull/21  ( by @karupanerura )
+
 # 0.1.5
 
 Enhancements:

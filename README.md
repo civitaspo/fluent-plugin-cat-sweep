@@ -111,14 +111,21 @@ tmp/test
 
 ```
 <source>
-  type cat_sweep
+  @type cat_sweep
 
   # Required. process files that match this pattern using glob.
   file_path_with_glob /tmp/test/file_*
 
-  # Input pattern. It depends on Parser plugin
-  format tsv
-  keys xpath,access_time,label,payload
+  # Parser Plugin Setting
+  # You can use the old style instead. (Not recommended)
+  # ===
+  # format tsv
+  # keys xpath,access_time,label,payload
+  # ===
+  <parse>
+    @type tsv
+    keys xpath,access_time,label,payload
+  </parse>
 
   # Required. process files that are older than this parameter(seconds).
   # [WARNING!!]: this plugin moves or removes files even if the files are still open.
