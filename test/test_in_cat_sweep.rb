@@ -121,7 +121,7 @@ class CatSweepInputTest < Test::Unit::TestCase
           waiting_seconds 0
           keys hdfs_path,unixtimestamp,label,message
           ])
-        d.run
+        d.run(timeout: 1, expect_records: 2) # timeout = waiting_seconds + 1
 
         compare_test_result(d.events, test_cases)
         assert { Dir.glob("#{TMP_DIR_FROM}/#{test_case_name}*").empty? }
@@ -149,7 +149,7 @@ class CatSweepInputTest < Test::Unit::TestCase
       keys hdfs_path,unixtimestamp,label,message
       move_to #{TMP_DIR_TO}
       ])
-    d.run
+    d.run(timeout: 1, expect_records: 2) # timeout = waiting_seconds + 1
 
     compare_test_result(d.events, test_cases)
 
@@ -184,7 +184,7 @@ class CatSweepInputTest < Test::Unit::TestCase
       oneline_max_bytes 1
       ])
 
-    d.run
+    d.run(timeout: 1, expect_records: 2) # timeout = waiting_seconds + 1
 
     assert_match(
       %r{\A#{TMP_DIR_FROM}/test_oneline_max_bytes.*\.error},
