@@ -28,7 +28,7 @@ module Fluent::Plugin
     config_param :flock_with_rw_mode,      :bool,    :default => false
 
     def configure(conf)
-      compat_parameters_convert(conf, :parser, :buffer, :extract, default_chunk_key: "time")
+      compat_parameters_convert(conf, :parser, :buffer, default_chunk_key: "time")
       super
 
       configure_parser(conf)
