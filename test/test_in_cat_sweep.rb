@@ -30,17 +30,17 @@ class CatSweepInputTest < Test::Unit::TestCase
         @type tsv
         keys ""
       </parse>
-      waiting_seconds 5
+      waiting_seconds 3
     ]
 
   CONFIG_MINIMUM_REQUIRED_IN_OLD_STYLE =
     CONFIG_BASE + %[
       format tsv
       keys ""
-      waiting_seconds 5
+      waiting_seconds 4
     ]
 
-  def create_driver(conf, use_v1 = true)
+  def create_driver(conf)
     Fluent::Test::Driver::Input.new(Fluent::Plugin::CatSweepInput).configure(conf)
   end
 
@@ -66,13 +66,13 @@ class CatSweepInputTest < Test::Unit::TestCase
 
     assert_equal "#{TMP_DIR_FROM}/*", d.instance.instance_variable_get(:@file_path_with_glob)
     assert_equal Fluent::Plugin::TSVParser, d.instance.instance_variable_get(:@parser).class
-    assert_equal 5, d.instance.instance_variable_get(:@waiting_seconds)
+    assert_equal 3, d.instance.instance_variable_get(:@waiting_seconds)
 
     d = create_driver(CONFIG_MINIMUM_REQUIRED_IN_OLD_STYLE)
 
     assert_equal "#{TMP_DIR_FROM}/*", d.instance.instance_variable_get(:@file_path_with_glob)
     assert_equal Fluent::Plugin::TSVParser, d.instance.instance_variable_get(:@parser).class
-    assert_equal 5, d.instance.instance_variable_get(:@waiting_seconds)
+    assert_equal 4, d.instance.instance_variable_get(:@waiting_seconds)
   end
 
   def test_configure_file_event_stream
