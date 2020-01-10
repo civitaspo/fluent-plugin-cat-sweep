@@ -174,11 +174,6 @@ tmp/test
 
 [CHANGELOG.md](CHANGELOG.md)
 
-## Warning
-
-* This plugin supports fluentd from v0.10.45
-* The support for fluentd v0.10 will end near future
-
 ## Contributing
 
 1. Fork it ( https://github.com/civitaspo/fluent-plugin-cat-sweep/fork )
